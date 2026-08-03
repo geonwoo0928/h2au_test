@@ -1,36 +1,36 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.14)
 project(h2au_project CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. OpenCV 라이브러리 탐색 (시스템 경로 자동 탐색)
-find_package(OpenCV REQUIRED)
-
-# 2. LibTorch 경로 분기 처리 (로컬 경로 우선, 없으면 자동 다운로드)
-if(DEFINED CMAKE_PREFIX_PATH OR DEFINED ENV{LIBTORCH_PATH})
-    message(STATUS "지정된 LibTorch 경로를 사용합니다.")
-    
-    if(DEFINED ENV{LIBTORCH_PATH})
-        list(APPEND CMAKE_PREFIX_PATH $ENV{LIBTORCH_PATH})
-    endif()
-
-    find_package(Torch REQUIRED)
-else()
-    message(STATUS "지정된 LibTorch 경로가 없어 인터넷에서 자동으로 다운로드합니다...")
-    include(FetchContent)
-    FetchContent_Declare(
-      LibTorch
-      URL https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.2.0%2Bcpu.zip
-    )
-    FetchContent_MakeAvailable(LibTorch)
-    
-    list(APPEND CMAKE_PREFIX_PATH ${libtorch_SOURCE_DIR})
-    find_package(Torch REQUIRED)
+if(DEFINED ENV{LIBTORCH_PATH})
+    list(APPEND CMAKE_PREFIX_PATH $ENV{LIBTORCH_PATH})
 endif()
 
-# 3. 실행 파일 및 라이브러리 연결
+if(APPLE)
+    list(APPEND CMAKE_PREFIX_PATH "/opt/homebrew" "/usr/local")
+endif()
+
+find_package(OpenCV REQUIRED)
+find_package(Torch REQUIRED)
+
+# main.cpp 외에 다른 .cpp 파일이 있다면 여기에 추가
 add_executable(my_app main.cpp)
 
-target_include_directories(my_app PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(my_app PRIVATE ${OpenCV_LIBS} "${TORCH_LIBRARIES}")
+if(MSVC)
+    target_compile_options(my_app PRIVATE /EHsc)
+endif()
+
+target_compile_options(my_app PRIVATE ${TORCH_CXX_FLAGS})
+
+target_include_directories(my_app PRIVATE 
+    ${OpenCV_INCLUDE_DIRS}
+    ${TORCH_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_link_libraries(my_app PRIVATE 
+    ${OpenCV_LIBS} 
+    ${TORCH_LIBRARIES}
+)
