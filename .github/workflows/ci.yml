@@ -1,0 +1,46 @@
+name: h2au CI Check
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    # 1. 빌드 도구, OpenCV 및 I2C 패키지 설치
+    - name: Install Build Tools, OpenCV & I2C Libs
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libopencv-dev libi2c-dev i2c-tools
+
+    # 2. LibTorch 캐싱 설정
+    - name: Cache LibTorch
+      id: cache-libtorch
+      uses: actions/cache@v4
+      with:
+        path: /tmp/libtorch
+        key: ${{ runner.os }}-libtorch-2.2.0
+
+    # 3. 캐시가 없을 때만 LibTorch 최초 1회 다운로드
+    - name: Download LibTorch (if not cached)
+      if: steps.cache-libtorch.outputs.cache-hit != 'true'
+      run: |
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.2.0%2Bcpu.zip -O libtorch.zip
+        unzip -q libtorch.zip -d /tmp/
+
+    # 4. CMake 설정 및 캐시/다운로드된 LibTorch 연결
+    - name: Configure CMake
+      run: |
+        cmake -B build -S . \
+          -DCMAKE_PREFIX_PATH="/tmp/libtorch;/usr/lib/x86_64-linux-gnu/cmake/opencv4"
+
+    # 5. 컴파일 및 빌드 검증
+    - name: Build Project
+      run: cmake --build build --config Release
