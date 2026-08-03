@@ -26,6 +26,7 @@ jobs:
       with:
         path: /tmp/libtorch
         key: ${{ runner.os }}-libtorch-2.2.0
+        save-always: true 
 
     - name: Download LibTorch (if not cached)
       if: steps.cache-libtorch.outputs.cache-hit != 'true'
