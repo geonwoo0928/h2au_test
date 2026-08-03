@@ -1,0 +1,77 @@
+# ==========================================
+# 1. CMake & 빌드 결과물 (Build Output)
+# ==========================================
+build/
+Build/
+bin/
+lib/
+out/
+
+# CMake 임시/생성 파일
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt  # CMakeLists.txt는 버전 관리에 포함
+install_manifest.txt
+
+# ==========================================
+# 2. 대용량 라이브러리 및 압축 파일 (LibTorch, OpenCV 등)
+# ==========================================
+libtorch/
+LibTorch/
+*.zip
+*.tar.gz
+*.tgz
+*.7z
+
+# ==========================================
+# 3. IDE 및 에디터 설정 (Editor / Tools)
+# ==========================================
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# CLion / JetBrains
+.idea/
+cmake-build-debug/
+cmake-build-release/
+
+# Visual Studio (Windows)
+.vs/
+*.user
+*.userosv
+*.sln
+*.vcxproj
+
+# ==========================================
+# 4. OS 자동 생성 파일 (OS Generated Files)
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ==========================================
+# 5. C/C++ 컴파일 부산물 (Object / Executable)
+# ==========================================
+*.o
+*.obj
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.a
+*.lib
